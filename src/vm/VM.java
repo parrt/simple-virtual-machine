@@ -25,8 +25,8 @@ import static vm.Bytecode.STORE;
 /** A simple stack-based interpreter */
 public class VM {
 	public static final int DEFAULT_STACK_SIZE = 1000;
-	public static final int TRUE = 1;
 	public static final int FALSE = 0;
+	public static final int TRUE = 1;
 
 	// registers
 	int ip;             // instruction pointer register
@@ -50,7 +50,7 @@ public class VM {
 	}
 
 	public void exec() {
-		stack[++sp] = 0; // simulate call from operating system
+		ip = startip;
 		cpu();
 	}
 
@@ -59,33 +59,33 @@ public class VM {
 		int opcode = code[ip];
 		int a,b,addr,offset;
 		while (opcode!= HALT && ip < code.length) {
-			if ( trace ) trace();
+			if ( trace ) System.out.printf("%-35s", disInstr());
 			ip++; //jump to next instruction or to operand
 			switch (opcode) {
 				case IADD:
-					a = stack[sp--]; 			// 1st opnd 1 below top
 					b = stack[sp--];   			// 2nd opnd at top of stack
+					a = stack[sp--]; 			// 1st opnd 1 below top
 					stack[++sp] = a + b;      	// push result
 					break;
 				case ISUB:
-					a = stack[sp--];
 					b = stack[sp--];
+					a = stack[sp--];
 					stack[++sp] = a - b;
 					break;
 				case IMUL:
-					a = stack[sp--];
 					b = stack[sp--];
+					a = stack[sp--];
 					stack[++sp] = a * b;
 					break;
 				case ILT :
-					a = stack[sp--];
 					b = stack[sp--];
-					stack[++sp] = a < b ? TRUE : FALSE;
+					a = stack[sp--];
+					stack[++sp] = (a < b) ? TRUE : FALSE;
 					break;
 				case IEQ :
-					a = stack[sp--];
 					b = stack[sp--];
-					stack[++sp] = a == b ? TRUE : FALSE;
+					a = stack[sp--];
+					stack[++sp] = (a == b) ? TRUE : FALSE;
 					break;
 				case CALL :
 					// expects all args on stack
@@ -146,27 +146,53 @@ public class VM {
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
 			}
+			if ( trace ) System.out.println(stackString());
 			opcode = code[ip];
 		}
+		if ( trace ) System.out.printf("%-35s", disInstr());
+		if ( trace ) System.out.println(stackString());
+		if ( trace ) dumpDataMemory();
 	}
 
-	protected void trace() {
+	protected String stackString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("stack=[");
+		for (int i = 0; i <= sp; i++) {
+			int o = stack[i];
+			buf.append(" ");
+			buf.append(o);
+		}
+		buf.append(" ]");
+		return buf.toString();
+	}
+
+	protected String disInstr() {
 		int opcode = code[ip];
 		String opName = Bytecode.instructions[opcode].name;
-		System.out.printf("%04d:\t%-11s", ip, opName);
+		StringBuilder buf = new StringBuilder();
+		buf.append(String.format("%04d:\t%-11s", ip, opName));
 		int nargs = Bytecode.instructions[opcode].n;
 		if ( nargs>0 ) {
 			List<String> operands = new ArrayList<String>();
 			for (int i=ip+1; i<=ip+nargs; i++) {
 				operands.add(String.valueOf(code[i]));
 			}
-			for (int i = 0; i < operands.size(); i++) {
+			for (int i = 0; i<operands.size(); i++) {
 				String s = operands.get(i);
-				if ( i>0 ) System.out.print(", ");
-				System.out.print(s);
+				if ( i>0 ) buf.append(", ");
+				buf.append(s);
 			}
+		}
+		return buf.toString();
+	}
+
+	protected void dumpDataMemory() {
+		System.out.println("Data memory:");
+		int addr = 0;
+		for (int o : globals) {
+			System.out.printf("%04d: %s\n", addr, o);
+			addr++;
 		}
 		System.out.println();
 	}
-
 }
