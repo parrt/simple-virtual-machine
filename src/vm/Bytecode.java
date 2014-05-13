@@ -19,13 +19,8 @@ public class Bytecode {
 	public static final short IEQ  = 5;     // int equal
 	public static final short BR   = 6;     // branch
 	public static final short BRT  = 7;     // branch if true
-<<<<<<< HEAD
 	public static final short BRF  = 8;     // branch if true
 	public static final short ICONST = 9;   // push constant integer
-=======
-	public static final short BRF  = 8;    // branch if true
-	public static final short ICONST = 9;  // push constant integer
->>>>>>> master
 	public static final short LOAD   = 10;  // load from local context
 	public static final short GLOAD  = 11;  // load from global memory
 	public static final short STORE  = 12;  // store in local context
@@ -33,11 +28,8 @@ public class Bytecode {
 	public static final short PRINT  = 14;  // print stack top
 	public static final short POP  = 15;    // throw away top of stack
 	public static final short HALT = 16;
-<<<<<<< HEAD
 	public static final short CALL = 17;
 	public static final short RET  = 18;    // return with/without value
-=======
->>>>>>> master
 
 	public static Instruction[] instructions = new Instruction[] {
 		null, // <INVALID>

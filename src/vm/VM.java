@@ -6,6 +6,7 @@ import java.util.List;
 import static vm.Bytecode.BR;
 import static vm.Bytecode.BRF;
 import static vm.Bytecode.BRT;
+import static vm.Bytecode.CALL;
 import static vm.Bytecode.GLOAD;
 import static vm.Bytecode.GSTORE;
 import static vm.Bytecode.HALT;
@@ -18,6 +19,7 @@ import static vm.Bytecode.ISUB;
 import static vm.Bytecode.LOAD;
 import static vm.Bytecode.POP;
 import static vm.Bytecode.PRINT;
+import static vm.Bytecode.RET;
 import static vm.Bytecode.STORE;
 
 /** A simple stack-based interpreter */
@@ -120,6 +122,26 @@ public class VM {
 					break;
 				case POP:
 					--sp;
+					break;
+				case CALL :
+					// expects all args on stack
+					addr = code[ip++];			// target addr of function
+					int nargs = code[ip++];		// how many args got pushed
+					stack[++sp] = nargs;	 	// save num args
+					stack[++sp] = fp;		 	// save fp
+					stack[++sp] = ip;		 	// push return address
+					fp = sp;					// fp points at ret addr on stack
+					ip = addr;					// jump to function
+					// code preamble of func must push space for locals
+					break;
+				case RET:
+					int rvalue = stack[sp--];	// pop return value
+					sp = fp;					// jump over locals to fp which points at ret addr
+					ip = stack[sp--];			// pop return address, jump to it
+					fp = stack[sp--];			// restore fp
+					nargs = stack[sp--];		// how many args to throw away?
+					sp -= nargs;				// pop args
+					stack[++sp] = rvalue;	  	// leave result on stack
 					break;
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
