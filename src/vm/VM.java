@@ -173,4 +173,14 @@ public class VM {
 		}
 		System.err.println();
 	}
+
+	protected void dumpCodeMemory() {
+		System.err.println("Code memory:");
+		int addr = 0;
+		for (int o : code) {
+			System.err.printf("%04d: %d\n", addr, o);
+			addr++;
+		}
+		System.err.println();
+	}
 }

@@ -48,6 +48,7 @@ public class Test {
 		VM vm = new VM(hello, 0, 0);
 		vm.trace = true;
 		vm.exec();
+		vm.dumpCodeMemory();
 
 		vm = new VM(loop, 0, 2);
 		vm.trace = true;
