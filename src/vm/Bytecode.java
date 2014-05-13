@@ -17,19 +17,19 @@ public class Bytecode {
 	public static final short IMUL = 3;
 	public static final short ILT  = 4;     // int less than
 	public static final short IEQ  = 5;     // int equal
-	public static final short CALL = 6;
-	public static final short RET  = 7;     // return with/without value
-	public static final short BR   = 8;     // branch
-	public static final short BRT  = 9;     // branch if true
-	public static final short BRF  = 10;    // branch if true
-	public static final short ICONST = 11;  // push constant integer
-	public static final short LOAD   = 12;  // load from local context
-	public static final short GLOAD  = 13;  // load from global memory
-	public static final short STORE  = 14;  // store in local context
-	public static final short GSTORE = 15;  // store in global memory
-	public static final short PRINT  = 16;  // print stack top
-	public static final short POP  = 17;    // throw away top of stack
-	public static final short HALT = 18;
+	public static final short BR   = 6;     // branch
+	public static final short BRT  = 7;     // branch if true
+	public static final short BRF  = 8;     // branch if true
+	public static final short ICONST = 9;   // push constant integer
+	public static final short LOAD   = 10;  // load from local context
+	public static final short GLOAD  = 11;  // load from global memory
+	public static final short STORE  = 12;  // store in local context
+	public static final short GSTORE = 13;  // store in global memory
+	public static final short PRINT  = 14;  // print stack top
+	public static final short POP  = 15;    // throw away top of stack
+	public static final short HALT = 16;
+	public static final short CALL = 17;
+	public static final short RET  = 18;    // return with/without value
 
 	public static Instruction[] instructions = new Instruction[] {
 		null, // <INVALID>
@@ -38,8 +38,6 @@ public class Bytecode {
 		new Instruction("imul"),
 		new Instruction("ilt"),
 		new Instruction("ieq"),
-		new Instruction("call", 2), // call addr, nargs
-		new Instruction("ret"),
 		new Instruction("br", 1),
 		new Instruction("brt", 1),
 		new Instruction("brf", 1),
@@ -50,6 +48,8 @@ public class Bytecode {
 		new Instruction("gstore", 1),
 		new Instruction("print"),
 		new Instruction("pop"),
-		new Instruction("halt")
+		new Instruction("halt"),
+		new Instruction("call", 2), // call addr, nargs
+		new Instruction("ret")
 	};
 }

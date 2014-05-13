@@ -67,20 +67,13 @@ public class Test {
 			RET,					// 21
 //.DEF MAIN: ARGS=0, LOCALS=0
 // PRINT FACT(10)
-			ICONST, 5,				// 22
+			ICONST, 5,				// 22    <-- MAIN METHOD!
 			CALL, 0, 1,				// 24
 			PRINT,					// 27
 			HALT					// 28
 	};
 
 	public static void main(String[] args) {
-//		VM vm = new VM(hello, 0, 0);
-//		vm.exec();
-//
-//		vm = new VM(loop, 0, 2);
-//		vm.trace = true;
-//		vm.exec();
-
 		VM vm = new VM(factorial, 22, 0);
 		vm.trace = true;
 		vm.exec();
