@@ -2,22 +2,19 @@ package vm;
 
 import static vm.Bytecode.BR;
 import static vm.Bytecode.BRF;
-import static vm.Bytecode.CALL;
 import static vm.Bytecode.GLOAD;
 import static vm.Bytecode.GSTORE;
 import static vm.Bytecode.HALT;
 import static vm.Bytecode.IADD;
 import static vm.Bytecode.ICONST;
 import static vm.Bytecode.ILT;
-import static vm.Bytecode.IMUL;
-import static vm.Bytecode.ISUB;
-import static vm.Bytecode.LOAD;
 import static vm.Bytecode.PRINT;
-import static vm.Bytecode.RET;
 
 public class Test {
 	static int[] hello = {
-		ICONST, 1234,
+		ICONST, 1,
+		ICONST, 2,
+		IADD,
 		PRINT,
 		HALT
 	};
@@ -47,6 +44,7 @@ public class Test {
 			HALT					// 24
 	};
 
+<<<<<<< HEAD
 	static int[] factorial = {
 //.def fact: ARGS=1, LOCALS=0		ADDRESS
 //	IF N < 2 RETURN 1
@@ -75,6 +73,14 @@ public class Test {
 
 	public static void main(String[] args) {
 		VM vm = new VM(factorial, 22, 0);
+=======
+	public static void main(String[] args) {
+		VM vm = new VM(hello, 0, 0);
+		vm.trace = true;
+		vm.exec();
+
+		vm = new VM(loop, 0, 2);
+>>>>>>> master
 		vm.trace = true;
 		vm.exec();
 	}

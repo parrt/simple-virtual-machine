@@ -6,7 +6,6 @@ import java.util.List;
 import static vm.Bytecode.BR;
 import static vm.Bytecode.BRF;
 import static vm.Bytecode.BRT;
-import static vm.Bytecode.CALL;
 import static vm.Bytecode.GLOAD;
 import static vm.Bytecode.GSTORE;
 import static vm.Bytecode.HALT;
@@ -19,7 +18,6 @@ import static vm.Bytecode.ISUB;
 import static vm.Bytecode.LOAD;
 import static vm.Bytecode.POP;
 import static vm.Bytecode.PRINT;
-import static vm.Bytecode.RET;
 import static vm.Bytecode.STORE;
 
 /** A simple stack-based interpreter */
@@ -38,7 +36,7 @@ public class VM {
 	// memory
 	int[] code;         // word-addressable code memory but still bytecodes.
 	int[] globals;      // global variable space
-	int[] stack;		// Operand/call stack, grows upwards
+	int[] stack;		// Operand stack, grows upwards
 
 	public boolean trace = false;
 
@@ -59,7 +57,7 @@ public class VM {
 		int opcode = code[ip];
 		int a,b,addr,offset;
 		while (opcode!= HALT && ip < code.length) {
-			if ( trace ) System.out.printf("%-35s", disInstr());
+			if ( trace ) System.err.printf("%-35s", disInstr());
 			ip++; //jump to next instruction or to operand
 			switch (opcode) {
 				case IADD:
@@ -86,26 +84,6 @@ public class VM {
 					b = stack[sp--];
 					a = stack[sp--];
 					stack[++sp] = (a == b) ? TRUE : FALSE;
-					break;
-				case CALL :
-					// expects all args on stack
-					addr = code[ip++];			// target addr of function
-					int nargs = code[ip++];		// how many args got pushed
-					stack[++sp] = nargs;	 	// save num args
-					stack[++sp] = fp;		 	// save fp
-					stack[++sp] = ip;		 	// push return address
-					fp = sp;					// fp points at ret addr on stack
-					ip = addr;					// jump to function
-					// code preamble of func must push space for locals
-					break;
-				case RET:
-					int rvalue = stack[sp--];	// pop return value
-					sp = fp;					// jump over locals to fp which points at ret addr
-					ip = stack[sp--];			// pop return address, jump to it
-					fp = stack[sp--];			// restore fp
-					nargs = stack[sp--];		// how many args to throw away?
-					sp -= nargs;				// pop args
-					stack[++sp] = rvalue;	  	// leave result on stack
 					break;
 				case BR :
 					ip = code[ip++];
@@ -146,11 +124,11 @@ public class VM {
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
 			}
-			if ( trace ) System.out.println(stackString());
+			if ( trace ) System.err.println(stackString());
 			opcode = code[ip];
 		}
-		if ( trace ) System.out.printf("%-35s", disInstr());
-		if ( trace ) System.out.println(stackString());
+		if ( trace ) System.err.printf("%-35s", disInstr());
+		if ( trace ) System.err.println(stackString());
 		if ( trace ) dumpDataMemory();
 	}
 
@@ -187,12 +165,12 @@ public class VM {
 	}
 
 	protected void dumpDataMemory() {
-		System.out.println("Data memory:");
+		System.err.println("Data memory:");
 		int addr = 0;
 		for (int o : globals) {
-			System.out.printf("%04d: %s\n", addr, o);
+			System.err.printf("%04d: %s\n", addr, o);
 			addr++;
 		}
-		System.out.println();
+		System.err.println();
 	}
 }
