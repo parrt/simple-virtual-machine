@@ -36,7 +36,6 @@ public class Bytecode {
 		new Instruction("imul"),
 		new Instruction("ilt"),
 		new Instruction("ieq"),
-		new Instruction("ret"),
 		new Instruction("br", 1),
 		new Instruction("brt", 1),
 		new Instruction("brf", 1),

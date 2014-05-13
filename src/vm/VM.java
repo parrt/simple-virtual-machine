@@ -57,7 +57,7 @@ public class VM {
 		int opcode = code[ip];
 		int a,b,addr,offset;
 		while (opcode!= HALT && ip < code.length) {
-			if ( trace ) System.out.printf("%-35s", disInstr());
+			if ( trace ) System.err.printf("%-35s", disInstr());
 			ip++; //jump to next instruction or to operand
 			switch (opcode) {
 				case IADD:
@@ -124,11 +124,11 @@ public class VM {
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
 			}
-			if ( trace ) System.out.println(stackString());
+			if ( trace ) System.err.println(stackString());
 			opcode = code[ip];
 		}
-		if ( trace ) System.out.printf("%-35s", disInstr());
-		if ( trace ) System.out.println(stackString());
+		if ( trace ) System.err.printf("%-35s", disInstr());
+		if ( trace ) System.err.println(stackString());
 		if ( trace ) dumpDataMemory();
 	}
 
@@ -165,12 +165,12 @@ public class VM {
 	}
 
 	protected void dumpDataMemory() {
-		System.out.println("Data memory:");
+		System.err.println("Data memory:");
 		int addr = 0;
 		for (int o : globals) {
-			System.out.printf("%04d: %s\n", addr, o);
+			System.err.printf("%04d: %s\n", addr, o);
 			addr++;
 		}
-		System.out.println();
+		System.err.println();
 	}
 }

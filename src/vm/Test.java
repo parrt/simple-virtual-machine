@@ -12,7 +12,9 @@ import static vm.Bytecode.PRINT;
 
 public class Test {
 	static int[] hello = {
-		ICONST, 1234,
+		ICONST, 1,
+		ICONST, 2,
+		IADD,
 		PRINT,
 		HALT
 	};
@@ -44,6 +46,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		VM vm = new VM(hello, 0, 0);
+		vm.trace = true;
 		vm.exec();
 
 		vm = new VM(loop, 0, 2);
