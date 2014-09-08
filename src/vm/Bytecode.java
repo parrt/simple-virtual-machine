@@ -19,7 +19,7 @@ public class Bytecode {
 	public static final short IEQ  = 5;     // int equal
 	public static final short BR   = 6;     // branch
 	public static final short BRT  = 7;     // branch if true
-	public static final short BRF  = 8;    // branch if true
+	public static final short BRF  = 8;    // branch if false
 	public static final short ICONST = 9;  // push constant integer
 	public static final short LOAD   = 10;  // load from local context
 	public static final short GLOAD  = 11;  // load from global memory
