@@ -25,13 +25,14 @@ import static vm.Bytecode.STORE;
 /** A simple stack-based interpreter */
 public class VM {
 	public static final int DEFAULT_STACK_SIZE = 1000;
+	public static final int DEFAULT_CALL_STACK_SIZE = 1000;
 	public static final int FALSE = 0;
 	public static final int TRUE = 1;
 
 	// registers
 	int ip;             // instruction pointer register
 	int sp = -1;  		// stack pointer register
-	int fp = -1;        // frame pointer register
+	int callsp = -1;    // call stack pointer register
 
 	int startip = 0;	// where execution begins
 
@@ -39,6 +40,7 @@ public class VM {
 	int[] code;         // word-addressable code memory but still bytecodes.
 	int[] globals;      // global variable space
 	int[] stack;		// Operand stack, grows upwards
+	Context[] callstack;// call stack, grows upwards
 
 	public boolean trace = false;
 
@@ -47,6 +49,7 @@ public class VM {
 		this.startip = startip;
 		globals = new int[nglobals];
 		stack = new int[DEFAULT_STACK_SIZE];
+		callstack = new Context[DEFAULT_CALL_STACK_SIZE];
 	}
 
 	public void exec() {
@@ -57,7 +60,7 @@ public class VM {
 	/** Simulate the fetch-decode execute cycle */
 	protected void cpu() {
 		int opcode = code[ip];
-		int a,b,addr,offset;
+		int a,b,addr,regnum;
 		while (opcode!= HALT && ip < code.length) {
 			if ( trace ) System.err.printf("%-35s", disInstr());
 			ip++; //jump to next instruction or to operand
@@ -102,16 +105,15 @@ public class VM {
 					stack[++sp] = code[ip++]; // push operand
 					break;
 				case LOAD : // load local or arg; 1st local is fp+1, args are fp-3, fp-4, fp-5, ...
-					offset = code[ip++];
-					stack[++sp] = stack[fp+offset];
+                    load();
 					break;
 				case GLOAD :// load from global memory
 					addr = code[ip++];
 					stack[++sp] = globals[addr];
 					break;
 				case STORE :
-					offset = code[ip++];
-					stack[fp+offset] = stack[sp--];
+					regnum = code[ip++];
+					callstack[callsp].locals[regnum] = stack[sp--];
 					break;
 				case GSTORE :
 					addr = code[ip++];
@@ -127,21 +129,17 @@ public class VM {
 					// expects all args on stack
 					addr = code[ip++];			// target addr of function
 					int nargs = code[ip++];		// how many args got pushed
-					stack[++sp] = nargs;	 	// save num args
-					stack[++sp] = fp;		 	// save fp
-					stack[++sp] = ip;		 	// push return address
-					fp = sp;					// fp points at ret addr on stack
+					callstack[++callsp] = new Context(ip,nargs);
+					// copy args into new context
+					for (int i=0; i<nargs; i++) {
+						callstack[callsp].locals[i] = stack[sp-i];
+					}
+					sp -= nargs;
 					ip = addr;					// jump to function
-					// code preamble of func must push space for locals
+					// TODO: code preamble of func must push space for locals
 					break;
 				case RET:
-					int rvalue = stack[sp--];	// pop return value
-					sp = fp;					// jump over locals to fp which points at ret addr
-					ip = stack[sp--];			// pop return address, jump to it
-					fp = stack[sp--];			// restore fp
-					nargs = stack[sp--];		// how many args to throw away?
-					sp -= nargs;				// pop args
-					stack[++sp] = rvalue;	  	// leave result on stack
+					ip = callstack[callsp--].returnip;
 					break;
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
@@ -154,7 +152,13 @@ public class VM {
 		if ( trace ) dumpDataMemory();
 	}
 
-	protected String stackString() {
+    private void load() {
+        int regnum;
+        regnum = code[ip++];
+        stack[++sp] = callstack[callsp].locals[regnum];
+    }
+
+    protected String stackString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("stack=[");
 		for (int i = 0; i <= sp; i++) {

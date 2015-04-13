@@ -24,6 +24,14 @@ public class Test {
 		HALT
 	};
 
+    /*
+    iconst(1);
+    iconst(2);
+    iadd();
+    print();
+    halt();
+     */
+
 	static int[] loop = {
 	// .GLOBALS 2; N, I
 	// N = 10						ADDRESS
@@ -49,10 +57,11 @@ public class Test {
 			HALT					// 24
 	};
 
+    static int fact = 0;
 	static int[] factorial = {
 //.def fact: ARGS=1, LOCALS=0		ADDRESS
 //	IF N < 2 RETURN 1
-			LOAD, -3,				// 0
+			LOAD, 0,				// 0
 			ICONST, 2,				// 2
 			ILT,					// 4
 			BRF, 10,				// 5
@@ -60,17 +69,17 @@ public class Test {
 			RET,					// 9
 //CONT:
 //	RETURN N * FACT(N-1)
-			LOAD, -3,				// 10
-			LOAD, -3,				// 12
+			LOAD, 0,				// 10
+			LOAD, 0,				// 12
 			ICONST, 1,				// 14
 			ISUB,					// 16
-			CALL, 0, 1,				// 17
+			CALL, fact, 1,			// 17
 			IMUL,					// 20
 			RET,					// 21
 //.DEF MAIN: ARGS=0, LOCALS=0
-// PRINT FACT(10)
+// PRINT FACT(1)
 			ICONST, 5,				// 22    <-- MAIN METHOD!
-			CALL, 0, 1,				// 24
+			CALL, fact, 1,				// 24
 			PRINT,					// 27
 			HALT					// 28
 	};
