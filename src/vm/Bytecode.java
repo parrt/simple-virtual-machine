@@ -30,8 +30,7 @@ public class Bytecode {
 	public static final short CALL = 16;
 	public static final short RET  = 17;    // return with/without value
 
-
-	public static final short HALT = 19;
+	public static final short HALT = 18;
 
 	public static Instruction[] instructions = new Instruction[] {
 		null, // <INVALID>
