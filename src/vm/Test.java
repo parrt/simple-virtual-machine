@@ -57,8 +57,11 @@ public class Test {
 	// PRINT "LOOPED "+N+" TIMES."
 			HALT					// 24
 	};
+	static FuncMetaData[] loop_metadata = {
+		new FuncMetaData("main", 0, 0, 0)
+	};
 
-	static int FACTORIAL_INDEX = 0;
+	static int FACTORIAL_INDEX = 1;
 	static int FACTORIAL_ADDRESS = 0;
 	static int MAIN_ADDRESS = 21;
 	static int[] factorial = {
@@ -88,15 +91,15 @@ public class Test {
 	};
 	static FuncMetaData[] factorial_metadata = {
 		//.def factorial: ARGS=1, LOCALS=0	ADDRESS
+		new FuncMetaData("main", 0, 0, MAIN_ADDRESS),
 		new FuncMetaData("factorial", 1, 0, FACTORIAL_ADDRESS)
 	};
-
 
 	static int[] f = {
 	//								ADDRESS
 	//.def main() { print f(10); }
 		ICONST, 10,					// 0
-		CALL, 0,					// 2
+		CALL, 1,					// 2
 		PRINT,						// 4
 		HALT,						// 5
 	//.def f(x): ARGS=1, LOCALS=1
@@ -110,22 +113,21 @@ public class Test {
 		RET
 	};
 	static FuncMetaData[] f_metadata = {
-		//.def factorial: ARGS=1, LOCALS=0	ADDRESS
+		new FuncMetaData("main", 0, 0, 0),
 		new FuncMetaData("f", 1, 1, 6)
 	};
 
 
 	public static void main(String[] args) {
-		VM vm = new VM(factorial, MAIN_ADDRESS, 0, factorial_metadata);
-		vm.trace = true;
-		vm.exec();
+		VM vm = new VM(factorial, 0, factorial_metadata);
+		vm.trace = false;
+		vm.exec(factorial_metadata[0].address);
 
-		vm = new VM(f, 0, 2, f_metadata);
-		vm.trace = true;
-		vm.exec();
+		vm = new VM(f, 2, f_metadata);
+		vm.exec(f_metadata[0].address);
+		vm.dumpDataMemory();
 
-		vm = new VM(loop, 0, 2, null);
-		vm.trace = true;
-		vm.exec();
+		vm = new VM(loop, 2, loop_metadata);
+		vm.exec(loop_metadata[0].address);
 	}
 }

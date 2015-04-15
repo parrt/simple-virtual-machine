@@ -32,15 +32,12 @@ public class VM {
 	// registers
 	int ip;             // instruction pointer register
 	int sp = -1;  		// stack pointer register
-	int callsp = -1;    // call stack pointer register
-
-	int startip = 0;	// where execution begins
 
 	// memory
 	int[] code;         // word-addressable code memory but still bytecodes.
 	int[] globals;      // global variable space
 	int[] stack;		// Operand stack, grows upwards
-	Context[] callstack;// call stack, grows upwards
+	Context ctx;		// the active context
 
 	/** Metadata about the functions allows us to refer to functions by
 	 * 	their index in this table. It makes code generation easier for
@@ -54,17 +51,16 @@ public class VM {
 
 	public boolean trace = false;
 
-	public VM(int[] code, int startip, int nglobals, FuncMetaData[] metadata) {
+	public VM(int[] code, int nglobals, FuncMetaData[] metadata) {
 		this.code = code;
-		this.startip = startip;
 		globals = new int[nglobals];
 		stack = new int[DEFAULT_STACK_SIZE];
-		callstack = new Context[DEFAULT_CALL_STACK_SIZE];
 		this.metadata = metadata;
 	}
 
-	public void exec() {
+	public void exec(int startip) {
 		ip = startip;
+		ctx = new Context(null,0,metadata[0]); // simulate a call to main()
 		cpu();
 	}
 
@@ -124,7 +120,7 @@ public class VM {
 					break;
 				case STORE :
 					regnum = code[ip++];
-					callstack[callsp].locals[regnum] = stack[sp--];
+					ctx.locals[regnum] = stack[sp--];
 					break;
 				case GSTORE :
 					addr = code[ip++];
@@ -140,22 +136,22 @@ public class VM {
 					// expects all args on stack
 					int findex = code[ip++];			// index of target function
 					int nargs = metadata[findex].nargs;	// how many args got pushed
-					int nlocals = metadata[findex].nlocals;
-					callstack[++callsp] = new Context(ip,nargs+nlocals);
+					ctx = new Context(ctx,ip,metadata[findex]);
 					// copy args into new context
 					for (int i=0; i<nargs; i++) {
-						callstack[callsp].locals[i] = stack[sp-i];
+						ctx.locals[i] = stack[sp-i];
 					}
 					sp -= nargs;
 					ip = metadata[findex].address;		// jump to function
 					break;
 				case RET:
-					ip = callstack[callsp--].returnip;
+					ip = ctx.returnip;
+					ctx = ctx.invokingContext;			// pop
 					break;
 				default :
 					throw new Error("invalid opcode: "+opcode+" at ip="+(ip-1));
 			}
-			if ( trace ) System.err.println(stackString());
+			if ( trace ) System.err.printf("%-22s %s\n", stackString(), callStackString());
 			opcode = code[ip];
 		}
 		if ( trace ) System.err.printf("%-35s", disInstr());
@@ -166,10 +162,10 @@ public class VM {
     private void load() {
         int regnum;
         regnum = code[ip++];
-        stack[++sp] = callstack[callsp].locals[regnum];
+        stack[++sp] = ctx.locals[regnum];
     }
 
-    protected String stackString() {
+	protected String stackString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("stack=[");
 		for (int i = 0; i <= sp; i++) {
@@ -179,6 +175,18 @@ public class VM {
 		}
 		buf.append(" ]");
 		return buf.toString();
+	}
+
+	protected String callStackString() {
+		List<String> stack = new ArrayList<String>();
+		Context c = ctx;
+		while ( c!=null ) {
+			if ( c.metadata!=null ) {
+				stack.add(0, c.metadata.name);
+			}
+			c = c.invokingContext;
+		}
+		return "calls="+stack.toString();
 	}
 
 	protected String disInstr() {
