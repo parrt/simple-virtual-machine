@@ -27,6 +27,7 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="IdProvider" IDEtalkID="8D99DC3F5DF14B998FCA4CE0FBC0D32A" />
   <component name="Palette2">
     <group name="Swing">
       <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
@@ -160,4 +161,3 @@
     <mapping directory="" vcs="Git" />
   </component>
 </project>
-
