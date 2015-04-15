@@ -42,14 +42,25 @@ public class VM {
 	int[] stack;		// Operand stack, grows upwards
 	Context[] callstack;// call stack, grows upwards
 
+	/** Metadata about the functions allows us to refer to functions by
+	 * 	their index in this table. It makes code generation easier for
+	 * 	the bytecode compiler because it doesn't have to resolve
+	 *  addresses for forward references. It can generate simply
+	 *  "CALL i" where i is the index of the function. Later, the
+	 *  compiler can store the function address in the metadata table
+	 *  when the code is generated for that function.
+	 */
+	FuncMetaData[] metadata;
+
 	public boolean trace = false;
 
-	public VM(int[] code, int startip, int nglobals) {
+	public VM(int[] code, int startip, int nglobals, FuncMetaData[] metadata) {
 		this.code = code;
 		this.startip = startip;
 		globals = new int[nglobals];
 		stack = new int[DEFAULT_STACK_SIZE];
 		callstack = new Context[DEFAULT_CALL_STACK_SIZE];
+		this.metadata = metadata;
 	}
 
 	public void exec() {
@@ -127,15 +138,15 @@ public class VM {
 					break;
 				case CALL :
 					// expects all args on stack
-					addr = code[ip++];			// target addr of function
-					int nargs = code[ip++];		// how many args got pushed
+					int findex = code[ip++];			// index of target function
+					int nargs = metadata[findex].nargs;	// how many args got pushed
 					callstack[++callsp] = new Context(ip,nargs);
 					// copy args into new context
 					for (int i=0; i<nargs; i++) {
 						callstack[callsp].locals[i] = stack[sp-i];
 					}
 					sp -= nargs;
-					ip = addr;					// jump to function
+					ip = metadata[findex].address;		// jump to function
 					// TODO: code preamble of func must push space for locals
 					break;
 				case RET:

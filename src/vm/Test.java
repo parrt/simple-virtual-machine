@@ -57,9 +57,11 @@ public class Test {
 			HALT					// 24
 	};
 
-    static int fact = 0;
+	static int FACTORIAL_INDEX = 0;
+	static int FACTORIAL_ADDRESS = 0;
+	static int MAIN_ADDRESS = 21;
 	static int[] factorial = {
-//.def fact: ARGS=1, LOCALS=0		ADDRESS
+//.def factorial: ARGS=1, LOCALS=0	ADDRESS
 //	IF N < 2 RETURN 1
 			LOAD, 0,				// 0
 			ICONST, 2,				// 2
@@ -73,19 +75,24 @@ public class Test {
 			LOAD, 0,				// 12
 			ICONST, 1,				// 14
 			ISUB,					// 16
-			CALL, fact, 1,			// 17
-			IMUL,					// 20
-			RET,					// 21
+			CALL, FACTORIAL_INDEX,	// 17
+			IMUL,					// 19
+			RET,					// 20
 //.DEF MAIN: ARGS=0, LOCALS=0
 // PRINT FACT(1)
-			ICONST, 5,				// 22    <-- MAIN METHOD!
-			CALL, fact, 1,				// 24
-			PRINT,					// 27
-			HALT					// 28
+			ICONST, 5,				// 21    <-- MAIN METHOD!
+			CALL, FACTORIAL_INDEX,	// 23
+			PRINT,					// 25
+			HALT					// 26
+	};
+
+	static FuncMetaData[] metadata = {
+		//.def factorial: ARGS=1, LOCALS=0	ADDRESS
+		new FuncMetaData("factorial", 1, 0, FACTORIAL_ADDRESS)
 	};
 
 	public static void main(String[] args) {
-		VM vm = new VM(factorial, 22, 0);
+		VM vm = new VM(factorial, MAIN_ADDRESS, 0, metadata);
 		vm.trace = true;
 		vm.exec();
 	}

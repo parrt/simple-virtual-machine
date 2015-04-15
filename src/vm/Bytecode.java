@@ -49,7 +49,7 @@ public class Bytecode {
 		new Instruction("gstore", 1),
 		new Instruction("print"),
 		new Instruction("pop"),
-		new Instruction("call", 2), // call addr, nargs
+		new Instruction("call", 1), // call index of function in meta-info table
 		new Instruction("ret"),
 		new Instruction("halt")
 	};
