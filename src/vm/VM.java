@@ -140,14 +140,14 @@ public class VM {
 					// expects all args on stack
 					int findex = code[ip++];			// index of target function
 					int nargs = metadata[findex].nargs;	// how many args got pushed
-					callstack[++callsp] = new Context(ip,nargs);
+					int nlocals = metadata[findex].nlocals;
+					callstack[++callsp] = new Context(ip,nargs+nlocals);
 					// copy args into new context
 					for (int i=0; i<nargs; i++) {
 						callstack[callsp].locals[i] = stack[sp-i];
 					}
 					sp -= nargs;
 					ip = metadata[findex].address;		// jump to function
-					// TODO: code preamble of func must push space for locals
 					break;
 				case RET:
 					ip = callstack[callsp--].returnip;

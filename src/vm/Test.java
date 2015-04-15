@@ -14,6 +14,7 @@ import static vm.Bytecode.ISUB;
 import static vm.Bytecode.LOAD;
 import static vm.Bytecode.PRINT;
 import static vm.Bytecode.RET;
+import static vm.Bytecode.STORE;
 
 public class Test {
 	static int[] hello = {
@@ -85,14 +86,45 @@ public class Test {
 			PRINT,					// 25
 			HALT					// 26
 	};
-
-	static FuncMetaData[] metadata = {
+	static FuncMetaData[] factorial_metadata = {
 		//.def factorial: ARGS=1, LOCALS=0	ADDRESS
 		new FuncMetaData("factorial", 1, 0, FACTORIAL_ADDRESS)
 	};
 
+
+	static int[] f = {
+	//								ADDRESS
+	//.def main() { print f(10); }
+		ICONST, 10,					// 0
+		CALL, 0,					// 2
+		PRINT,						// 4
+		HALT,						// 5
+	//.def f(x): ARGS=1, LOCALS=1
+	//  a = x;
+		LOAD, 0,					// 6	<-- start of f
+		STORE, 1,
+	// return 2*a
+		LOAD, 1,
+		ICONST, 2,
+		IMUL,
+		RET
+	};
+	static FuncMetaData[] f_metadata = {
+		//.def factorial: ARGS=1, LOCALS=0	ADDRESS
+		new FuncMetaData("f", 1, 1, 6)
+	};
+
+
 	public static void main(String[] args) {
-		VM vm = new VM(factorial, MAIN_ADDRESS, 0, metadata);
+		VM vm = new VM(factorial, MAIN_ADDRESS, 0, factorial_metadata);
+		vm.trace = true;
+		vm.exec();
+
+		vm = new VM(f, 0, 2, f_metadata);
+		vm.trace = true;
+		vm.exec();
+
+		vm = new VM(loop, 0, 2, null);
 		vm.trace = true;
 		vm.exec();
 	}
