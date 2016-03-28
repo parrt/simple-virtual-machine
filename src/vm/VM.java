@@ -29,7 +29,6 @@ public class VM {
 	// registers
 	int ip;             // instruction pointer register
 	int sp = -1;  		// stack pointer register
-	int fp = -1;        // frame pointer register
 
 	int startip = 0;	// where execution begins
 
@@ -99,17 +98,9 @@ public class VM {
 				case ICONST:
 					stack[++sp] = code[ip++]; // push operand
 					break;
-				case LOAD : // load local or arg; 1st local is fp+1, args are fp-3, fp-4, fp-5, ...
-					offset = code[ip++];
-					stack[++sp] = stack[fp+offset];
-					break;
 				case GLOAD :// load from global memory
 					addr = code[ip++];
 					stack[++sp] = globals[addr];
-					break;
-				case STORE :
-					offset = code[ip++];
-					stack[fp+offset] = stack[sp--];
 					break;
 				case GSTORE :
 					addr = code[ip++];
