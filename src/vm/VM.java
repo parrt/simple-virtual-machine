@@ -139,8 +139,9 @@ public class VM {
 					int nargs = metadata[findex].nargs;	// how many args got pushed
 					ctx = new Context(ctx,ip,metadata[findex]);
 					// copy args into new context
+					int firstarg = sp-nargs+1;
 					for (int i=0; i<nargs; i++) {
-						ctx.locals[i] = stack[sp-i];
+						ctx.locals[i] = stack[firstarg+i];
 					}
 					sp -= nargs;
 					ip = metadata[findex].address;		// jump to function
