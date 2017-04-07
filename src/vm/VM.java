@@ -144,8 +144,9 @@ public class VM {
 					int nlocals = metadata[findex].nlocals;
 					callstack[++callsp] = new Context(ip,nargs+nlocals);
 					// copy args into new context
+					int firstarg = sp-nargs+1;
 					for (int i=0; i<nargs; i++) {
-						callstack[callsp].locals[i] = stack[sp-i];
+						callstack[callsp].locals[i] = stack[firstarg+i];
 					}
 					sp -= nargs;
 					ip = metadata[findex].address;		// jump to function
