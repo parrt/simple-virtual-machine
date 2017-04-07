@@ -115,8 +115,9 @@ public class VM {
 				case ICONST:
 					stack[++sp] = code[ip++]; // push operand
 					break;
-				case LOAD : // load local or arg; 1st local is fp+1, args are fp-3, fp-4, fp-5, ...
-                    load();
+				case LOAD : // load local or arg
+					regnum = code[ip++];
+					stack[++sp] = callstack[callsp].locals[regnum];
 					break;
 				case GLOAD :// load from global memory
 					addr = code[ip++];
@@ -163,13 +164,7 @@ public class VM {
 		if ( trace ) dumpDataMemory();
 	}
 
-    private void load() {
-        int regnum;
-        regnum = code[ip++];
-        stack[++sp] = callstack[callsp].locals[regnum];
-    }
-
-    protected String stackString() {
+	protected String stackString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("stack=[");
 		for (int i = 0; i <= sp; i++) {
