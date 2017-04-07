@@ -137,7 +137,6 @@ public class VM {
 					}
 					sp -= nargs;
 					ip = addr;					// jump to function
-					// TODO: code preamble of func must push space for locals
 					break;
 				case RET:
 					ip = callstack[callsp--].returnip;
