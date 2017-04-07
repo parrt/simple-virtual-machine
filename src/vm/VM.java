@@ -111,8 +111,9 @@ public class VM {
 				case ICONST:
 					stack[++sp] = code[ip++]; // push operand
 					break;
-				case LOAD : // load local or arg; 1st local is fp+1, args are fp-3, fp-4, fp-5, ...
-                    load();
+				case LOAD : // load local or arg
+					regnum = code[ip++];
+					stack[++sp] = ctx.locals[regnum];
 					break;
 				case GLOAD :// load from global memory
 					addr = code[ip++];
@@ -159,12 +160,6 @@ public class VM {
 		if ( trace ) dumpDataMemory();
 	}
 
-    private void load() {
-        int regnum;
-        regnum = code[ip++];
-        stack[++sp] = ctx.locals[regnum];
-    }
-
 	protected String stackString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("stack=[");
@@ -195,7 +190,10 @@ public class VM {
 		StringBuilder buf = new StringBuilder();
 		buf.append(String.format("%04d:\t%-11s", ip, opName));
 		int nargs = Bytecode.instructions[opcode].n;
-		if ( nargs>0 ) {
+		if ( opcode==CALL ) {
+			buf.append(metadata[code[ip+1]].name);
+		}
+		else if ( nargs>0 ) {
 			List<String> operands = new ArrayList<String>();
 			for (int i=ip+1; i<=ip+nargs; i++) {
 				operands.add(String.valueOf(code[i]));

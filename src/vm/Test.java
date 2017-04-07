@@ -120,7 +120,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		VM vm = new VM(factorial, 0, factorial_metadata);
-		vm.trace = false;
+		vm.trace = true;
 		vm.exec(factorial_metadata[0].address);
 
 		vm = new VM(f, 2, f_metadata);
