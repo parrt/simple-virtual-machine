@@ -25,14 +25,6 @@ public class Test {
 		HALT
 	};
 
-    /*
-    iconst(1);
-    iconst(2);
-    iadd();
-    print();
-    halt();
-     */
-
 	static int[] loop = {
 	// .GLOBALS 2; N, I
 	// N = 10						ADDRESS
