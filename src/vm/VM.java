@@ -182,7 +182,10 @@ public class VM {
 		StringBuilder buf = new StringBuilder();
 		buf.append(String.format("%04d:\t%-11s", ip, opName));
 		int nargs = Bytecode.instructions[opcode].n;
-		if ( nargs>0 ) {
+		if ( opcode==CALL ) {
+			buf.append(metadata[code[ip+1]].name);
+		}
+		else if ( nargs>0 ) {
 			List<String> operands = new ArrayList<String>();
 			for (int i=ip+1; i<=ip+nargs; i++) {
 				operands.add(String.valueOf(code[i]));
